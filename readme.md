@@ -5,7 +5,6 @@
 - webpack
 - webpack cli
 
-
 - babel-loader
 - @babel/core
 - @babel/preset-env
