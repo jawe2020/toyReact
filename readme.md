@@ -4,3 +4,9 @@
 
 - webpack
 - webpack cli
+
+
+- babel-loader
+- @babel/core
+- @babel/preset-env
+- @babel/plugin-transform-react-jsx
