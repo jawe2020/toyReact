@@ -5,6 +5,12 @@ class ElementWrapper {
     this.root = document.createElement(type);
   }
   setAttribute(name, value) {
+    if (name.match(/^on([\s\S]+)$/)) {
+      this.root.addEventListener(
+        RegExp.$1.replace(/^[\s\S]/, (c) => c.toLocaleLowerCase()),
+        value
+      );
+    }
     this.root.setAttribute(name, value);
   }
   appendChild(component) {
@@ -35,6 +41,7 @@ export class Component {
     this.props = Object.create(null);
     this.children = [];
     this._root = null;
+    this._range = null;
   }
   setAttribute(name, value) {
     this.props[name] = value;
@@ -44,7 +51,33 @@ export class Component {
   }
 
   [RENDER_TO_DOM](range) {
+    this._range = range;
     this.render()[RENDER_TO_DOM](range);
+  }
+
+  rerender() {
+    this._range.deleteContents();
+    this[RENDER_TO_DOM](this._range);
+  }
+
+  setState(newState) {
+    if (this.state === null || typeof this.state !== "object") {
+      this.state = newState;
+      return this.rerender();
+    }
+
+    let merge = (oldState, newState) => {
+      for (let p in newState) {
+        if (oldState[p] === null || typeof oldState[p] !== "object") {
+          oldState[p] = newState[p];
+        } else {
+          merge(oldState[p], newState[p]);
+        }
+      }
+    };
+
+    merge(this.state, newState);
+    return this.rerender();
   }
 }
 
